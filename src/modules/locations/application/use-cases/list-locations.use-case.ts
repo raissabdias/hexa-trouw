@@ -6,9 +6,10 @@ export class ListLocationsUseCase {
     constructor(
         @Inject('LocationRepositoryPort')
         private readonly locationRepo: LocationRepositoryPort
-    ) { }
+    ) {}
 
-    async execute() {
-        return this.locationRepo.findAll();
+    // Executes the use case to retrieve a paginated list of locations
+    async execute(page: number = 1, limit: number = 10) {
+        return this.locationRepo.findAll(page, limit);
     }
 }

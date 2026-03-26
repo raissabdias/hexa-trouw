@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, ParseIntPipe, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, ParseIntPipe, Param, Query } from '@nestjs/common';
 import { CreateLocationUseCase } from '../../application/use-cases/create-location.use-case';
 import { ListLocationsUseCase } from '../../application/use-cases/list-locations.use-case';
 import { GetLocationByPersonUseCase } from '../../application/use-cases/get-location-by-person.use-case';
@@ -19,8 +19,12 @@ export class LocationController {
     }
 
     @Get()
-    async findAll() {
-        return this.listLocationsUseCase.execute();
+    async findAll(
+        @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
+        @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
+    ) {
+        console.log(`Buscando página ${page} com limite ${limit}`); // Adicione este log!
+        return this.listLocationsUseCase.execute(page, limit);
     }
 
     @Get(':personId')
