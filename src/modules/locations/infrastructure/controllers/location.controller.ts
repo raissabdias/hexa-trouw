@@ -10,7 +10,7 @@ export class LocationController {
         private readonly createLocationUseCase: CreateLocationUseCase,
         private readonly listLocationsUseCase: ListLocationsUseCase,
         private readonly getLocationByPersonUseCase: GetLocationByPersonUseCase,
-    ) {}
+    ) { }
 
     @Post()
     async create(@Body() body: any) {
@@ -24,7 +24,6 @@ export class LocationController {
         @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
         @Query('search') search?: string,
     ) {
-        console.log(`Buscando página ${page} com limite ${limit}`); // Adicione este log!
         return this.listLocationsUseCase.execute(page, limit, search);
     }
 
