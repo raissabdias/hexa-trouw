@@ -4,13 +4,23 @@ import { LocationEntity } from '../entities/location.entity';
 export class LocationMapper {
     // Maps persistence entity data into the domain model
     static toDomain(entity: LocationEntity): Location {
+        const document = entity.person?.physicalPerson?.cpf ||
+            entity.person?.legalPerson?.cnpj ||
+            null;
+
+        const personData = entity.person ? {
+            ...entity.person,
+            document: document
+        } : undefined;
+
         return new Location(
             entity.id,
             entity.personId,
             entity.referenceId,
-            entity.radius,
-            // Legacy schema stores active state as 'S'/'N'.
+            Number(entity.radius),
             entity.active === 'S',
+            personData,
+            entity.reference
         );
     }
 

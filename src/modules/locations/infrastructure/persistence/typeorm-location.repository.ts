@@ -41,7 +41,11 @@ export class TypeOrmLocationRepository implements LocationRepositoryPort {
     }
 
     async findByPersonId(personId: number): Promise<Location | null> {
-        const entity = await this.repository.findOneBy({ personId });
+        const entity = await this.repository.findOne({
+            where: { personId },
+            relations: ['person', 'person.physicalPerson', 'person.legalPerson', 'reference']
+        });
+
         if (!entity) return null;
 
         return LocationMapper.toDomain(entity);

@@ -6,6 +6,8 @@ export class Location {
         public readonly referenceId: number,
         public readonly radius: number,
         public readonly isActive: boolean,
+        public readonly person?: any,
+        public readonly reference?: any,
     ) { }
 
     // Radius must be non-negative to represent a valid geofence boundary

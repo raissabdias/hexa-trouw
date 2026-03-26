@@ -6,6 +6,7 @@ import { CreateLocationUseCase } from './application/use-cases/create-location.u
 import { ListLocationsUseCase } from './application/use-cases/list-locations.use-case';
 import { TypeOrmLocationRepository } from './infrastructure/persistence/typeorm-location.repository';
 import { PersonsModule } from '../persons/persons.module';
+import { GetLocationByPersonUseCase } from './application/use-cases/get-location-by-person.use-case';
 
 @Module({
     imports: [
@@ -15,11 +16,12 @@ import { PersonsModule } from '../persons/persons.module';
     controllers: [LocationController],
     providers: [
         CreateLocationUseCase,
+        ListLocationsUseCase,
+        GetLocationByPersonUseCase,
         {
             provide: 'LocationRepositoryPort',
             useClass: TypeOrmLocationRepository,
         },
-        ListLocationsUseCase
     ],
 })
 export class LocationsModule { }
