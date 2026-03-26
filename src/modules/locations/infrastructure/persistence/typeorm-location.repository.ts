@@ -32,7 +32,11 @@ export class TypeOrmLocationRepository implements LocationRepositoryPort {
     }
 
     async findAll(): Promise<Location[]> {
-        const entities = await this.repository.find();
+        const entities = await this.repository.find({
+            relations: ['person', 'reference'],
+            order: { id: 'DESC' }
+        });
+
         return entities.map(entity => LocationMapper.toDomain(entity));
     }
 }

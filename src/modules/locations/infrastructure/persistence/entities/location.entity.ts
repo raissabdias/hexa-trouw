@@ -1,4 +1,6 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { PersonEntity } from '../../../../persons/infrastructure/persistence/entities/person.entity';
+import { ReferenceEntity } from './reference.entity';
 
 @Entity('lcal_local')
 export class LocationEntity {
@@ -16,4 +18,12 @@ export class LocationEntity {
 
     @Column({ name: 'lcal_ativo', default: 'S' })
     active: string;
+
+    @ManyToOne(() => PersonEntity)
+    @JoinColumn({ name: 'lcal_pess_oras_codigo' })
+    person: PersonEntity;
+
+    @ManyToOne(() => ReferenceEntity)
+    @JoinColumn({ name: 'lcal_refe_codigo' })
+    reference: ReferenceEntity;
 }
