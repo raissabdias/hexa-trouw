@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity('nota_nota')
+@Entity('nota_nota_fiscal')
 export class InvoiceEntity {
     @PrimaryGeneratedColumn({ name: 'nota_codigo' })
     id: number;
@@ -41,6 +41,6 @@ export class InvoiceEntity {
     @CreateDateColumn({ name: 'nota_data_cadastro' })
     createdAt: Date;
 
-    @UpdateDateColumn({ name: 'nota_data_alteracao' })
+    @UpdateDateColumn({ name: 'nota_data_atualizacao' })
     updatedAt: Date;
 }
