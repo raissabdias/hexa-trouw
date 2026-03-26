@@ -12,16 +12,28 @@ export class CreateLocationUseCase {
         private readonly personsService: PersonsService,
     ) { }
 
-    async execute(dto: any): Promise<Location> {
-        const newPersonId = await this.personsService.createPerson(dto.personName);
-        console.log('ID da nova pessoa criada:', newPersonId);
-        
+    async execute(data: {
+        personName: string;
+        cpf?: string;
+        cnpj?: string;
+        referenceId: number;
+        radius: number
+    }): Promise<Location> {
+        // Create a new person first
+        const newPersonId = await this.personsService.createFullPerson({
+            name: data.personName,
+            cpf: data.cpf,
+            cnpj: data.cnpj
+        });
+
+        console.log(`Pessoa criada com sucesso! ID: ${newPersonId}`);
+
         // New locations start as active by default
         const newLocation = new Location(
             null,
             newPersonId,
-            dto.referenceId,
-            dto.radius,
+            data.referenceId,
+            data.radius,
             true, // lcal_ativo = 'S'
         );
 
