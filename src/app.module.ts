@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LocationsModule } from './modules/locations/locations.module';
 import { LocationEntity } from './modules/locations/infrastructure/persistence/entities/location.entity';
+import { InvoiceModule } from './modules/invoices/invoices.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { LocationEntity } from './modules/locations/infrastructure/persistence/e
       }),
     }),
     LocationsModule,
+    InvoiceModule,
   ],
 })
 export class AppModule { }
