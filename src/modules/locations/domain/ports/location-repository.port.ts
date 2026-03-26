@@ -8,6 +8,6 @@ export interface LocationRepositoryPort {
     findById(id: number): Promise<Location | null>;
 
     findByPersonId(personId: number): Promise<Location | null>; 
-    
-    findAll(page: number, limit: number): Promise<{ data: Location[], total: number }>;
+
+    findAll(page: number, limit: number, search?: string): Promise<{ data: Location[], total: number }>;
 }

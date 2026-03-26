@@ -9,7 +9,7 @@ export class ListLocationsUseCase {
     ) {}
 
     // Executes the use case to retrieve a paginated list of locations
-    async execute(page: number = 1, limit: number = 10) {
-        return this.locationRepo.findAll(page, limit);
+    async execute(page: number = 1, limit: number = 10, search?: string) {
+        return this.locationRepo.findAll(page, limit, search);
     }
 }

@@ -22,9 +22,10 @@ export class LocationController {
     async findAll(
         @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
         @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
+        @Query('search') search?: string,
     ) {
         console.log(`Buscando página ${page} com limite ${limit}`); // Adicione este log!
-        return this.listLocationsUseCase.execute(page, limit);
+        return this.listLocationsUseCase.execute(page, limit, search);
     }
 
     @Get(':personId')

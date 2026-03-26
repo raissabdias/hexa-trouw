@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { LocationRepositoryPort } from '../../domain/ports/location-repository.port';
 import { Location } from '../../domain/models/location.model';
 import { LocationEntity } from './entities/location.entity';
@@ -31,8 +31,17 @@ export class TypeOrmLocationRepository implements LocationRepositoryPort {
         return LocationMapper.toDomain(entity);
     }
 
-    async findAll(page: number = 1, limit: number = 10): Promise<{ data: Location[], total: number }> {
+    async findAll(page: number = 1, limit: number = 10, search?: string): Promise<{ data: Location[], total: number }> {
         const skippedItems = (page - 1) * limit;
+
+        // Build dynamic where conditions based on the presence of a search term
+        let whereCondition: any = {};
+        if (search) {
+            whereCondition = [
+                { person: { name: ILike(`%${search}%`) } },
+                { reference: { description: ILike(`%${search}%`) } }
+            ];
+        }
 
         const [entities, total] = await this.repository.findAndCount({
             relations: [
@@ -41,6 +50,7 @@ export class TypeOrmLocationRepository implements LocationRepositoryPort {
                 'person.legalPerson',
                 'reference'
             ],
+            where: whereCondition,
             skip: skippedItems,
             take: limit,
             order: { id: 'DESC' }
