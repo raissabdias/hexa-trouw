@@ -31,12 +31,26 @@ export class TypeOrmLocationRepository implements LocationRepositoryPort {
         return LocationMapper.toDomain(entity);
     }
 
-    async findAll(): Promise<Location[]> {
-        const entities = await this.repository.find({
-            relations: ['person', 'reference'],
+    async findAll(page: number = 1, limit: number = 10): Promise<{ data: Location[], total: number }> {
+        const skippedItems = (page - 1) * limit;
+
+        const [entities, total] = await this.repository.findAndCount({
+            relations: [
+                'person',
+                'person.physicalPerson',
+                'person.legalPerson',
+                'reference'
+            ],
+            skip: skippedItems,
+            take: limit,
             order: { id: 'DESC' }
         });
 
-        return entities.map(entity => LocationMapper.toDomain(entity));
+        const locations = entities.map(entity => LocationMapper.toDomain(entity));
+
+        return {
+            data: locations,
+            total: total
+        };
     }
 }
