@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, ConflictException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { PersonsService } from '../../../persons/persons.service';
 import { ReferenceEntity } from '../../infrastructure/persistence/entities/reference.entity';
@@ -39,12 +39,31 @@ export class CreateLocationUseCase {
     ) { }
 
     async execute(input: CreateLocationInput) {
-        // Create or reuse a person, handling both physical and legal types
-        const personId = await this.personsService.createFullPerson({
-            name: input.person.name,
-            cnpj: input.person.cnpj,
+        let personId = await this.personsService.findIdByDocument({
             cpf: input.person.cpf,
+            cnpj: input.person.cnpj
         });
+
+        if (personId) {
+            const existingLocation = await this.locationRepo.findByPersonId(personId);
+            
+            // Enforce the business rule that a person cannot have more than one location registered
+            if (existingLocation) {
+                throw new ConflictException('This person already has a registered location. Multiple locations per person are not allowed.');
+            }
+        } else {
+            // Create or reuse a person, handling both physical and legal types
+            personId = await this.personsService.createFullPerson({
+                name: input.person.name,
+                cnpj: input.person.cnpj,
+                cpf: input.person.cpf,
+            });
+        }
+        
+        // Normalize ZIP code by stripping non-numeric characters, if provided
+        if (input.address.zipCode) {
+            input.address.zipCode = input.address.zipCode.replace(/\D/g, '');
+        }
 
         // Register the address as a reference entity
         const reference = await this.createReference(input);

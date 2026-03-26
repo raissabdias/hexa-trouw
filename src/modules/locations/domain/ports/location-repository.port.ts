@@ -8,4 +8,6 @@ export interface LocationRepositoryPort {
     findById(id: number): Promise<Location | null>;
 
     findAll(): Promise<Location[]>;
+
+    findByPersonId(personId: number): Promise<Location | null>;
 }

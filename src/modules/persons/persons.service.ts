@@ -62,13 +62,16 @@ export class PersonsService {
             });
             await queryRunner.manager.save(person);
 
+            const cleanCpf = data.cpf ? this.clearString(data.cpf) : undefined;
+            const cleanCnpj = data.cnpj ? this.clearString(data.cnpj) : undefined;
+
             // Persist exactly one subtype: physical person (CPF) or legal person (CNPJ)
-            if (data.cpf) {
-                await queryRunner.manager.save(PhysicalPersonEntity, { id: id, cpf: data.cpf });
-            } else if (data.cnpj) {
+            if (cleanCpf) {
+                await queryRunner.manager.save(PhysicalPersonEntity, { id: id, cpf: cleanCpf });
+            } else if (cleanCnpj) {
                 await queryRunner.manager.save(LegalPersonEntity, {
                     id: id,
-                    cnpj: data.cnpj,
+                    cnpj: cleanCnpj,
                     // Fall back to the person name when no company name is provided
                     companyName: data.companyName || data.name,
                 });
@@ -91,6 +94,30 @@ export class PersonsService {
             throw err;
         } finally {
             await queryRunner.release();
+        }
+    }
+
+    // Utility to strip non-numeric characters for CPF/CNPJ normalization
+    private clearString(str: string): string {
+        return str.replace(/\D/g, '');
+    }
+
+    // Finds a person ID by their CPF or CNPJ, returning null if not found
+    async findIdByDocument(doc: { cpf?: string; cnpj?: string }): Promise<number | null> {
+        const cleanDoc = doc.cpf ? this.clearString(doc.cpf) : (doc.cnpj ? this.clearString(doc.cnpj) : null);
+
+        if (!cleanDoc) return null;
+
+        if (doc.cpf) {
+            const person = await this.dataSource
+                .getRepository(PhysicalPersonEntity)
+                .findOneBy({ cpf: cleanDoc });
+            return person ? person.id : null;
+        } else {
+            const person = await this.dataSource
+                .getRepository(LegalPersonEntity)
+                .findOneBy({ cnpj: cleanDoc });
+            return person ? person.id : null;
         }
     }
 }

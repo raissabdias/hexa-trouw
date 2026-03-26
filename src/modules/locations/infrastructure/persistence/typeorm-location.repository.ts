@@ -39,4 +39,11 @@ export class TypeOrmLocationRepository implements LocationRepositoryPort {
 
         return entities.map(entity => LocationMapper.toDomain(entity));
     }
+
+    async findByPersonId(personId: number): Promise<Location | null> {
+        const entity = await this.repository.findOneBy({ personId });
+        if (!entity) return null;
+
+        return LocationMapper.toDomain(entity);
+    }
 }
