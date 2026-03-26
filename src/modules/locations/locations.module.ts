@@ -4,9 +4,13 @@ import { LocationEntity } from './infrastructure/persistence/entities/location.e
 import { LocationController } from './infrastructure/controllers/location.controller';
 import { CreateLocationUseCase } from './application/use-cases/create-location.use-case';
 import { TypeOrmLocationRepository } from './infrastructure/persistence/typeorm-location.repository';
+import { PersonsModule } from '../persons/persons.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([LocationEntity])],
+    imports: [
+        TypeOrmModule.forFeature([LocationEntity]),
+        PersonsModule
+    ],
     controllers: [LocationController],
     providers: [
         CreateLocationUseCase,

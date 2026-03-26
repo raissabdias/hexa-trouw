@@ -19,7 +19,7 @@ import { LocationEntity } from './modules/locations/infrastructure/persistence/e
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASS'),
         database: configService.get<string>('DB_NAME'),
-        entities: [LocationEntity],
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: false,
       }),
     }),
