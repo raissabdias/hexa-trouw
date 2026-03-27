@@ -5,6 +5,7 @@ import { InvoiceEntity } from './infrastructure/persistence/entities/invoice.ent
 import { TypeOrmInvoiceRepository } from './infrastructure/persistence/repositories/typeorm-invoice.repository';
 import { CreateInvoiceUseCase } from './application/use-cases/create-invoice.use-case';
 import { InvoiceController } from './infrastructure/controllers/invoice.controller';
+import { ListInvoicesUseCase } from './application/use-cases/list-invoices.use-case';
 
 @Module({
     imports: [
@@ -14,6 +15,7 @@ import { InvoiceController } from './infrastructure/controllers/invoice.controll
     controllers: [InvoiceController],
     providers: [
         CreateInvoiceUseCase,
+        ListInvoicesUseCase,
         {
             provide: 'InvoiceRepositoryPort',
             useClass: TypeOrmInvoiceRepository,

@@ -4,6 +4,7 @@ import type { InvoiceRepositoryPort } from '../../domain/ports/invoice-repositor
 import { Invoice } from '../../domain/models/invoice.model';
 
 @Injectable()
+// Application service for creating a new invoice, enforcing business rules.
 export class CreateInvoiceUseCase {
     constructor(
         @Inject('InvoiceRepositoryPort')
@@ -12,14 +13,16 @@ export class CreateInvoiceUseCase {
     ) {}
 
     async execute(data: any): Promise<Invoice> {
+        // Get company context from configuration.
         const companyId = Number(this.configService.get<string>('COMPANY_ID'));
 
-        // Validação básica de duplicidade
+        // Prevent duplicate invoice numbers for the same company.
         const existing = await this.invoiceRepo.findByNumber(data.number, companyId);
         if (existing) {
             throw new ConflictException(`Invoice ${data.number} already exists.`);
         }
 
+        // Compose the domain model for the new invoice.
         const invoice = new Invoice(
             null,
             data.number,
@@ -29,7 +32,7 @@ export class CreateInvoiceUseCase {
             data.volume,
             data.recipientId,
             companyId,
-            1,
+            1, // Default status
             true,
             data.issuedAt ? new Date(data.issuedAt) : null,
             data.scheduledDelivery ? new Date(data.scheduledDelivery) : null

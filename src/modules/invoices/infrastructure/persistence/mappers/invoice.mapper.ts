@@ -2,6 +2,7 @@ import { Invoice } from '../../../domain/models/invoice.model';
 import { InvoiceEntity } from '../entities/invoice.entity';
 
 export class InvoiceMapper {
+    // Maps persistence entity data into the domain model.
     static toDomain(entity: InvoiceEntity): Invoice {
         return new Invoice(
             entity.id,
@@ -21,6 +22,7 @@ export class InvoiceMapper {
         );
     }
 
+    // Maps domain model into persistence format expected by the database.
     static toPersistence(domain: Invoice): InvoiceEntity {
         const entity = new InvoiceEntity();
 
@@ -37,6 +39,7 @@ export class InvoiceMapper {
         entity.recipientId = domain.recipientId;
         entity.companyId = domain.companyId;
         entity.statusId = domain.statusId;
+        // Keep compatibility with existing CHAR flag convention.
         entity.active = domain.isActive ? 'S' : 'N';
 
         entity.issuedAt = domain.issuedAt as any;

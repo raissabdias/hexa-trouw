@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { InvoiceRepositoryPort } from '../../../domain/ports/invoice-repository.port';
 import { Invoice } from '../../../domain/models/invoice.model';
 import { InvoiceEntity } from '../entities/invoice.entity';
@@ -29,5 +29,36 @@ export class TypeOrmInvoiceRepository implements InvoiceRepositoryPort {
             where: { number, companyId, active: 'S' }
         });
         return entity ? InvoiceMapper.toDomain(entity) : null;
+    }
+
+    async findAll(
+        page: number = 1,
+        limit: number = 10,
+        search?: string
+    ): Promise<{ data: Invoice[], total: number }> {
+        const skip = (page - 1) * limit;
+
+        let whereCondition: any = { active: 'S' };
+
+        if (search) {
+            whereCondition = {
+                number: ILike(`%${search}%`),
+                active: 'S'
+            };
+        }
+
+        const [entities, total] = await this.repository.findAndCount({
+            where: whereCondition,
+            skip: skip,
+            take: limit,
+            order: { id: 'DESC' }
+        });
+
+        const invoices = entities.map(entity => InvoiceMapper.toDomain(entity));
+
+        return {
+            data: invoices,
+            total: total
+        };
     }
 }
