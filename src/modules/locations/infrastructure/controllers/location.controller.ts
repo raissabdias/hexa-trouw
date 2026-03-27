@@ -4,6 +4,8 @@ import { CreateLocationUseCase } from '../../application/use-cases/create-locati
 import { ListLocationsUseCase } from '../../application/use-cases/list-locations.use-case';
 import { GetLocationByPersonUseCase } from '../../application/use-cases/get-location-by-person.use-case';
 import { CreateLocationDto } from './dto/create-location.dto';
+import { LocationListResponseDto, LocationSingleResponseDto } from './dto/location-response.dto';
+import { ApiResponseDto } from '../../../../common/dto/api-response.dto';
 
 @ApiTags('Locations')
 @Controller('locations')
@@ -18,6 +20,7 @@ export class LocationController {
     @Post()
     @ApiOperation({ summary: 'Create a new location' })
     @ApiBody({ type: CreateLocationDto })
+    @ApiResponse({ status: 201, type: LocationSingleResponseDto, description: 'Location created successfully' })
     @HttpCode(HttpStatus.CREATED)
     async create(@Body() body: CreateLocationDto) {
         // Delegate business logic to the application layer
@@ -29,7 +32,7 @@ export class LocationController {
     @ApiQuery({ name: 'page', required: false, type: Number })
     @ApiQuery({ name: 'limit', required: false, type: Number })
     @ApiQuery({ name: 'search', required: false, type: String })
-    @ApiResponse({ status: 200, description: 'Listed successfully' })
+    @ApiResponse({ status: 200, type: LocationListResponseDto, description: 'Listed successfully' })
     async findAll(
         @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
         @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
@@ -41,7 +44,7 @@ export class LocationController {
 
     @Get(':personId')
     @ApiOperation({ summary: 'Get location by person ID' })
-    @ApiResponse({ status: 200, description: 'Location found.' })
+    @ApiResponse({ status: 200, type: LocationSingleResponseDto, description: 'Location found.' })
     @ApiResponse({ status: 404, description: 'Location not found.' })
     async findByPerson(@Param('personId', ParseIntPipe) personId: number) {
         // Delegate the search to the Use Case we created

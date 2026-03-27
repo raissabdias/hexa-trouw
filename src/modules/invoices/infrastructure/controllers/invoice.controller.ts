@@ -4,6 +4,7 @@ import { CreateInvoiceUseCase } from '../../application/use-cases/create-invoice
 import { ListInvoicesUseCase } from '../../application/use-cases/list-invoices.use-case';
 import { GetInvoiceByIdUseCase } from '../../application/use-cases/get-invoice-by-id.use-case';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
+import { InvoiceListResponseDto, InvoiceResponseDto, InvoiceSingleResponseDto } from './dto/invoice-response.dto';
 
 @ApiTags('Invoices')
 @Controller('invoices')
@@ -27,7 +28,7 @@ export class InvoiceController {
     @ApiQuery({ name: 'page', required: false, type: Number })
     @ApiQuery({ name: 'limit', required: false, type: Number })
     @ApiQuery({ name: 'search', required: false, type: String })
-    @ApiResponse({ status: 200, description: 'Listed successfully' })
+    @ApiResponse({ status: 200, type: InvoiceListResponseDto, description: 'Listed successfully' })
     async findAll(
         @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
         @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
@@ -38,7 +39,7 @@ export class InvoiceController {
 
     @Get(':id')
     @ApiOperation({ summary: 'Get invoice by ID' })
-    @ApiResponse({ status: 200, description: 'Invoice found.' })
+    @ApiResponse({ status: 200, type: InvoiceSingleResponseDto, description: 'Invoice found.' })
     @ApiResponse({ status: 404, description: 'Invoice not found.' })
     async findById(@Param('id', ParseIntPipe) id: number) {
         return await this.getInvoiceByIdUseCase.execute(id);
