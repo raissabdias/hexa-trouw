@@ -7,10 +7,11 @@ import { CreateInvoiceUseCase } from './application/use-cases/create-invoice.use
 import { InvoiceController } from './infrastructure/controllers/invoice.controller';
 import { ListInvoicesUseCase } from './application/use-cases/list-invoices.use-case';
 import { GetInvoiceByIdUseCase } from './application/use-cases/get-invoice-by-id.use-case';
+import { InvoiceStatusEntity } from './infrastructure/persistence/entities/invoice-status.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([InvoiceEntity]),
+        TypeOrmModule.forFeature([InvoiceEntity, InvoiceStatusEntity]),
         ConfigModule,
     ],
     controllers: [InvoiceController],

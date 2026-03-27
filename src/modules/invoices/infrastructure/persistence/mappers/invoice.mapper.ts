@@ -19,6 +19,7 @@ export class InvoiceMapper {
             entity.scheduledDelivery,
             entity.createdAt,
             entity.updatedAt,
+            entity.status?.description,
         );
     }
 
@@ -38,7 +39,7 @@ export class InvoiceMapper {
 
         entity.recipientId = domain.recipientId;
         entity.companyId = domain.companyId;
-        entity.statusId = domain.statusId;
+        entity.statusId = domain.statusId;entity.status?.description,
         // Keep compatibility with existing CHAR flag convention.
         entity.active = domain.isActive ? 'S' : 'N';
 

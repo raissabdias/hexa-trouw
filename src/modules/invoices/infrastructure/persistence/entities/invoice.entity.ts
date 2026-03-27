@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, JoinColumn, ManyToOne } from 'typeorm';
+import { InvoiceStatusEntity } from './invoice-status.entity';
 
 @Entity('nota_nota_fiscal')
 export class InvoiceEntity {
@@ -28,6 +29,10 @@ export class InvoiceEntity {
 
     @Column({ name: 'nota_nfst_codigo', default: 1 })
     statusId: number;
+
+    @ManyToOne(() => InvoiceStatusEntity)
+    @JoinColumn({ name: 'nota_nfst_codigo' })
+    status: InvoiceStatusEntity;
 
     @Column({ name: 'nota_ativo', default: 'S' })
     active: string;

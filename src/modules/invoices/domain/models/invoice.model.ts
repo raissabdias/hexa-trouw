@@ -14,5 +14,6 @@ export class Invoice {
         public readonly scheduledDelivery: Date | null,
         public readonly createdAt?: Date,
         public readonly updatedAt?: Date,
+        public readonly statusDescription?: string,
     ) { }
 }

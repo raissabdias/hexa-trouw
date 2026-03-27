@@ -20,13 +20,17 @@ export class TypeOrmInvoiceRepository implements InvoiceRepositoryPort {
     }
 
     async findById(id: number, companyId: number): Promise<Invoice | null> {
-        const entity = await this.repository.findOne({ where: { id, companyId, active: 'S' } });
+        const entity = await this.repository.findOne({ 
+            where: { id, companyId, active: 'S' },
+            relations: ['status']
+        });
         return entity ? InvoiceMapper.toDomain(entity) : null;
     }
 
     async findByNumber(number: string, companyId: number): Promise<Invoice | null> {
         const entity = await this.repository.findOne({
-            where: { number, companyId, active: 'S' }
+            where: { number, companyId, active: 'S' },
+            relations: ['status']
         });
         return entity ? InvoiceMapper.toDomain(entity) : null;
     }
@@ -54,6 +58,7 @@ export class TypeOrmInvoiceRepository implements InvoiceRepositoryPort {
 
         const [entities, total] = await this.repository.findAndCount({
             where: whereCondition,
+            relations: ['status'],
             skip: skip,
             take: limit,
             order: { id: 'DESC' }
