@@ -19,8 +19,8 @@ export class TypeOrmInvoiceRepository implements InvoiceRepositoryPort {
         return InvoiceMapper.toDomain(savedEntity);
     }
 
-    async findById(id: number): Promise<Invoice | null> {
-        const entity = await this.repository.findOne({ where: { id } });
+    async findById(id: number, companyId: number): Promise<Invoice | null> {
+        const entity = await this.repository.findOne({ where: { id, companyId, active: 'S' } });
         return entity ? InvoiceMapper.toDomain(entity) : null;
     }
 

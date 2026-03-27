@@ -5,7 +5,7 @@ export interface InvoiceRepositoryPort {
     // Persists and returns the resulting aggregate state.
     save(invoice: Invoice): Promise<Invoice>;
 
-    findById(id: number): Promise<Invoice | null>;
+    findById(id: number, companyId: number): Promise<Invoice | null>;
 
     // Find by unique invoice number within a company context.
     findByNumber(number: string, companyId: number): Promise<Invoice | null>;
