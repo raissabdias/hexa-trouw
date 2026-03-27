@@ -1,4 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { InvoiceRepositoryPort } from '../../domain/ports/invoice-repository.port';
 import { Invoice } from '../../domain/models/invoice.model';
 
@@ -7,6 +8,7 @@ export class ListInvoicesUseCase {
     constructor(
         @Inject('InvoiceRepositoryPort')
         private readonly invoiceRepo: InvoiceRepositoryPort,
+        private readonly configService: ConfigService,
     ) { }
 
     // Application service for listing invoices with pagination and optional search
@@ -15,6 +17,7 @@ export class ListInvoicesUseCase {
         limit: number = 10,
         search?: string
     ): Promise<{ data: Invoice[], total: number }> {
-        return await this.invoiceRepo.findAll(page, limit, search);
+        const companyId = Number(this.configService.get<string>('COMPANY_ID'));
+        return await this.invoiceRepo.findAll(page, limit, search, companyId);
     }
 }

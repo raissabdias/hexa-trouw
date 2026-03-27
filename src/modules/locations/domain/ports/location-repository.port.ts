@@ -9,5 +9,5 @@ export interface LocationRepositoryPort {
 
     findByPersonId(personId: number): Promise<Location | null>; 
 
-    findAll(page: number, limit: number, search?: string): Promise<{ data: Location[], total: number }>;
+    findAll(page: number, limit: number, search?: string, companyId?: number): Promise<{ data: Location[], total: number }>;
 }

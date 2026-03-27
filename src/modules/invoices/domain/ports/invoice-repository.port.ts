@@ -14,6 +14,7 @@ export interface InvoiceRepositoryPort {
     findAll(
         page: number,
         limit: number,
-        search?: string
+        search?: string,
+        companyId?: number
     ): Promise<{ data: Invoice[], total: number }>;
 }

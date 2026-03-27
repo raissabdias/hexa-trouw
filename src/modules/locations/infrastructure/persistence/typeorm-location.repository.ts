@@ -5,6 +5,7 @@ import { LocationRepositoryPort } from '../../domain/ports/location-repository.p
 import { Location } from '../../domain/models/location.model';
 import { LocationEntity } from './entities/location.entity';
 import { LocationMapper } from './mappers/location.mapper';
+import { AssociationEntity } from 'src/modules/persons/infrastructure/persistence/entities/association.entity';
 
 @Injectable()
 // TypeORM-backed adapter that fulfills the domain repository contract
@@ -31,30 +32,32 @@ export class TypeOrmLocationRepository implements LocationRepositoryPort {
         return LocationMapper.toDomain(entity);
     }
 
-    async findAll(page: number = 1, limit: number = 10, search?: string): Promise<{ data: Location[], total: number }> {
+    async findAll(page: number = 1, limit: number = 10, search?: string, companyId?: number): Promise<{ data: Location[], total: number }> {
         const skippedItems = (page - 1) * limit;
 
-        // Build dynamic where conditions based on the presence of a search term
-        let whereCondition: any = {};
+        // Build a query that joins the necessary tables to filter locations by company association and optional search criteria
+        const queryBuilder = this.repository.createQueryBuilder('lcal')
+            .innerJoinAndSelect('lcal.person', 'pess')
+            .leftJoinAndSelect('pess.physicalPerson', 'pfis')
+            .leftJoinAndSelect('pess.legalPerson', 'pjur')
+            .leftJoinAndSelect('lcal.reference', 'refe')
+            .innerJoin(AssociationEntity, 'asob', 'asob.childId = pess.id') 
+            .where('lcal.active = :active', { active: 'S' })
+            .andWhere('asob.parentId = :companyId', { companyId })
+            .andWhere('asob.active = 1');
+
         if (search) {
-            whereCondition = [
-                { person: { name: ILike(`%${search}%`) } },
-                { reference: { description: ILike(`%${search}%`) } }
-            ];
+            queryBuilder.andWhere(
+                '(pess.name ILIKE :search OR refe.description ILIKE :search)',
+                { search: `%${search}%` }
+            );
         }
 
-        const [entities, total] = await this.repository.findAndCount({
-            relations: [
-                'person',
-                'person.physicalPerson',
-                'person.legalPerson',
-                'reference'
-            ],
-            where: whereCondition,
-            skip: skippedItems,
-            take: limit,
-            order: { id: 'DESC' }
-        });
+        const [entities, total] = await queryBuilder
+            .orderBy('lcal.id', 'DESC') 
+            .skip(skippedItems)
+            .take(limit)
+            .getManyAndCount();
 
         const locations = entities.map(entity => LocationMapper.toDomain(entity));
 

@@ -34,15 +34,20 @@ export class TypeOrmInvoiceRepository implements InvoiceRepositoryPort {
     async findAll(
         page: number = 1,
         limit: number = 10,
-        search?: string
+        search?: string,
+        companyId?: number
     ): Promise<{ data: Invoice[], total: number }> {
         const skip = (page - 1) * limit;
 
-        let whereCondition: any = { active: 'S' };
+        let whereCondition: any = { 
+            companyId: companyId, 
+            active: 'S'
+        };
 
         if (search) {
             whereCondition = {
                 number: ILike(`%${search}%`),
+                companyId: companyId, 
                 active: 'S'
             };
         }
