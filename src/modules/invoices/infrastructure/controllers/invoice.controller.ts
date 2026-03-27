@@ -1,8 +1,9 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, Get, ParseIntPipe, Query, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { CreateInvoiceUseCase } from '../../application/use-cases/create-invoice.use-case';
 import { ListInvoicesUseCase } from '../../application/use-cases/list-invoices.use-case';
 import { GetInvoiceByIdUseCase } from '../../application/use-cases/get-invoice-by-id.use-case';
+import { CreateInvoiceDto } from './dto/create-invoice.dto';
 
 @ApiTags('Invoices')
 @Controller('invoices')
@@ -15,8 +16,9 @@ export class InvoiceController {
 
     @Post()
     @ApiOperation({ summary: 'Create a new invoice' })
+    @ApiBody({ type: CreateInvoiceDto })
     @HttpCode(HttpStatus.CREATED)
-    async create(@Body() body: any) {
+    async create(@Body() body: CreateInvoiceDto) {
         return await this.createInvoiceUseCase.execute(body);
     }
 

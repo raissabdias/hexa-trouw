@@ -1,8 +1,9 @@
 import { Controller, Post, Body, Get, ParseIntPipe, Param, Query, HttpStatus, HttpCode } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { CreateLocationUseCase } from '../../application/use-cases/create-location.use-case';
 import { ListLocationsUseCase } from '../../application/use-cases/list-locations.use-case';
 import { GetLocationByPersonUseCase } from '../../application/use-cases/get-location-by-person.use-case';
+import { CreateLocationDto } from './dto/create-location.dto';
 
 @ApiTags('Locations')
 @Controller('locations')
@@ -16,8 +17,9 @@ export class LocationController {
 
     @Post()
     @ApiOperation({ summary: 'Create a new location' })
+    @ApiBody({ type: CreateLocationDto })
     @HttpCode(HttpStatus.CREATED)
-    async create(@Body() body: any) {
+    async create(@Body() body: CreateLocationDto) {
         // Delegate business logic to the application layer
         return await this.createLocationUseCase.execute(body);
     }
