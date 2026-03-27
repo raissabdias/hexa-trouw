@@ -46,6 +46,20 @@ export class InvoiceResponseDto {
 
     @ApiProperty({ example: '2023-10-27T09:00:00Z', description: 'Last update date' })
     updatedAt: Date;
+
+    recipient?: {
+        name: string;
+        address: {
+            address: string;
+            number: string;
+            neighborhood: string;
+            zipCode: string;
+            city: string;
+            state: string;
+            latitude: number | null;
+            longitude: number | null;
+        }
+    };
 }
 
 export class InvoiceListResponseDto extends ApiResponseDto<InvoiceResponseDto[]> {

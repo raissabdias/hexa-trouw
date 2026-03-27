@@ -8,10 +8,17 @@ import { InvoiceController } from './infrastructure/controllers/invoice.controll
 import { ListInvoicesUseCase } from './application/use-cases/list-invoices.use-case';
 import { GetInvoiceByIdUseCase } from './application/use-cases/get-invoice-by-id.use-case';
 import { InvoiceStatusEntity } from './infrastructure/persistence/entities/invoice-status.entity';
+import { ReferenceEntity } from '../locations/infrastructure/persistence/entities/reference.entity';
+import { LocationEntity } from '../locations/infrastructure/persistence/entities/location.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([InvoiceEntity, InvoiceStatusEntity]),
+        TypeOrmModule.forFeature([
+            InvoiceEntity,
+            InvoiceStatusEntity, 
+            LocationEntity, 
+            ReferenceEntity
+        ]),
         ConfigModule,
     ],
     controllers: [InvoiceController],

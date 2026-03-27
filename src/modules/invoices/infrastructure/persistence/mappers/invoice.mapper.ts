@@ -1,9 +1,24 @@
+import { zip } from 'rxjs';
 import { Invoice } from '../../../domain/models/invoice.model';
 import { InvoiceEntity } from '../entities/invoice.entity';
 
 export class InvoiceMapper {
     // Maps persistence entity data into the domain model.
     static toDomain(entity: InvoiceEntity): Invoice {
+        const recipient = entity.location ? {
+            name: entity.location.person?.name,
+            address: {
+                address: entity.location.reference?.address,
+                number: entity.location.reference?.number,
+                neighborhood: entity.location.reference?.neighborhood,
+                zipCode: entity.location.reference?.zipCode,
+                city: entity.location.reference?.city,
+                state: entity.location.reference?.state,
+                latitude: entity.location.reference?.latitude,
+                longitude: entity.location.reference?.longitude,
+            },
+        } : undefined;
+
         return new Invoice(
             entity.id,
             entity.number,
@@ -20,6 +35,7 @@ export class InvoiceMapper {
             entity.createdAt,
             entity.updatedAt,
             entity.status?.description,
+            recipient,
         );
     }
 
@@ -39,9 +55,9 @@ export class InvoiceMapper {
 
         entity.recipientId = domain.recipientId;
         entity.companyId = domain.companyId;
-        entity.statusId = domain.statusId;entity.status?.description,
-        // Keep compatibility with existing CHAR flag convention.
-        entity.active = domain.isActive ? 'S' : 'N';
+        entity.statusId = domain.statusId; entity.status?.description,
+            // Keep compatibility with existing CHAR flag convention.
+            entity.active = domain.isActive ? 'S' : 'N';
 
         entity.issuedAt = domain.issuedAt as any;
         entity.scheduledDelivery = domain.scheduledDelivery as any;

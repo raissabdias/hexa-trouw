@@ -15,5 +15,18 @@ export class Invoice {
         public readonly createdAt?: Date,
         public readonly updatedAt?: Date,
         public readonly statusDescription?: string,
+        public readonly recipient?: {
+            name: string;
+            address: {
+                address: string;
+                number: string;
+                neighborhood: string;
+                zipCode: string;
+                city: string;
+                state: string;
+                latitude: number | null;
+                longitude: number | null;
+            }
+        },
     ) { }
 }

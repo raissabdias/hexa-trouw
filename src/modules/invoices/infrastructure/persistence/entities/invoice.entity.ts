@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { InvoiceStatusEntity } from './invoice-status.entity';
+import { LocationEntity } from '../../../../locations/infrastructure/persistence/entities/location.entity';
 
 @Entity('nota_nota_fiscal')
 export class InvoiceEntity {
@@ -48,4 +49,8 @@ export class InvoiceEntity {
 
     @UpdateDateColumn({ name: 'nota_data_atualizacao' })
     updatedAt: Date;
+
+    @OneToOne(() => LocationEntity)
+    @JoinColumn({ name: 'nota_destinatario_pess_oras_codigo', referencedColumnName: 'personId' })
+    location: LocationEntity;
 }
