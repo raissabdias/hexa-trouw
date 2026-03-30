@@ -4,6 +4,7 @@ import { CreateTravelDto } from '../../infrastructure/controllers/dto/create-tra
 import type { InvoiceRepositoryPort } from 'src/modules/invoices/domain/ports/invoice-repository.port';
 import type { LocationRepositoryPort } from 'src/modules/locations/domain/ports/location-repository.port';
 import type { RouterExternalPort } from '../../domain/ports/router-external.port';
+import { TravelLogicService } from '../../domain/services/travel-logic.service';
 
 @Injectable()
 export class CreateTravelUseCase {
@@ -15,6 +16,7 @@ export class CreateTravelUseCase {
         private readonly locationRepo: LocationRepositoryPort,
         @Inject('RouterExternalPort')
         private readonly routerExternal: RouterExternalPort,
+        private readonly travelLogicService: TravelLogicService
     ) { }
 
     async execute(data: CreateTravelDto) {
@@ -51,10 +53,20 @@ export class CreateTravelUseCase {
             data.startDate,
             companyId
         );
+        
+        const travelPoints = this.travelLogicService.groupDetailsIntoTravelPoints(
+            { 
+                id: data.originPersonId, 
+                lat: String(origin.reference.latitude), 
+                lng: String(origin.reference.longitude) 
+            }, 
+            routeResult.details
+        );
 
         return {
             message: 'Viagem roteirizada com sucesso!',
             summary: routeResult.summary,
+            travelPoints,
             details: routeResult.details,
             polyline: routeResult.polyline
         };
