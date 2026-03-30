@@ -23,5 +23,6 @@ import { GetLocationByPersonUseCase } from './application/use-cases/get-location
             useClass: TypeOrmLocationRepository,
         },
     ],
+    exports: ['LocationRepositoryPort'],
 })
 export class LocationsModule { }

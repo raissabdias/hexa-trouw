@@ -1,11 +1,14 @@
 import { Controller, Post, Body, HttpStatus, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CreateTravelDto } from './dto/create-travel.dto';
+import { CreateTravelUseCase } from '../../application/use-cases/create-travel.use-case';
 
 @ApiTags('Travels')
 @Controller('travels')
 export class TravelController {
-    constructor() {}
+    constructor(
+        private readonly createTravelUseCase: CreateTravelUseCase
+    ) {}
 
     @Post()
     @ApiOperation({ summary: 'Creates a new travel based on invoices and origin' })
@@ -19,10 +22,6 @@ export class TravelController {
     })
     @HttpCode(HttpStatus.CREATED)
     async create(@Body() body: CreateTravelDto) {
-        return {
-            success: true,
-            message: 'Travel request received',
-            data: body
-        };
+        return await this.createTravelUseCase.execute(body);
     }
 }

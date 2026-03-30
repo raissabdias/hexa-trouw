@@ -31,5 +31,6 @@ import { LocationEntity } from '../locations/infrastructure/persistence/entities
             useClass: TypeOrmInvoiceRepository,
         },
     ],
+    exports: ['InvoiceRepositoryPort'],
 })
 export class InvoiceModule { }
