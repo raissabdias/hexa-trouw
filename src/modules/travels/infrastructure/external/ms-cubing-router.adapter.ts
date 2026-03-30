@@ -59,26 +59,37 @@ export class MsCubingRouterAdapter implements RouterExternalPort {
                 this.httpService.post<any>(this.url, payload)
             );
             
-            console.log(response);
-            const data = response.data[0]; 
+            const data = Array.isArray(response.data) ? response.data[0] : response.data;
+            const vehicle = data.vehicles[0][0];
+            const startTime = new Date(startDate).getTime();
 
-            if (data.errors && data.errors.length > 0) {
-                console.error('Erros de negócio do MS Cubing:', data.errors);
-                throw new InternalServerErrorException(`MS Cubing: ${data.errors[0].reason}`);
-            }
+            const details = vehicle.invoices.map((invItem: any, index: number) => {
+                const arrivalTime = new Date(invItem.arrivalTime).getTime();
+                const durationSeconds = Math.max(0, Math.floor((arrivalTime - startTime) / 1000));
 
-            if (!data || !data.vehicles) {
-                console.error('Unexpected response from MS Cubing:', response.data);
-                throw new Error('Invalid response structure: "vehicles" field not found.');
-            }
-            
+                return {
+                    nota_id: invItem.invoiceId,
+                    local_id: invItem.localDeliveryId,
+                    sequencia: index + 1,
+                    distancia_ponto_anterior_metros: invItem.distanceFromLastStop || 0,
+                    duracao_desde_inicio_segundos: durationSeconds,
+                    latitude: String(invItem.location.lat),
+                    longitude: String(invItem.location.lng)
+                };
+            });
+
             return {
-                rawResponse: data,
-                sequence: data.vehicles[0][0].invoices.map((inv: any, index: number) => ({
-                    invoiceId: inv.invoiceId,
-                    order: index + 1,
-                    estimatedArrival: new Date(inv.arrivalTime)
-                }))
+                summary: {
+                    totalDistance: vehicle.metrics.totalDistance,
+                    totalDuration: vehicle.metrics.totalDuration,
+                    weightUsed: vehicle.dimentions.usedWeightCapacity,
+                    weightCapacity: vehicle.dimentions.totalWeightCapacity,
+                    volumeUsed: vehicle.dimentions.usedCubing,
+                    volumeCapacity: vehicle.dimentions.totalCubing,
+                },
+                details: details,
+                polyline: vehicle.polyline || [],
+                rawResponse: data
             };
         } catch (error) {
             console.error('Error MS Cubing:', error.response?.data || error.message);

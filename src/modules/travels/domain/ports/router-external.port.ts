@@ -9,11 +9,24 @@ export interface RouterInvoiceInput {
 }
 
 export interface RouterResponse {
-    sequence: {
-        invoiceId: number;
-        order: number;
-        estimatedArrival: Date;
+    summary: {
+        totalDistance: number;
+        totalDuration: number;
+        weightUsed: number;
+        weightCapacity: number;
+        volumeUsed: number;
+        volumeCapacity: number;
+    };
+    details: {
+        nota_id: number;
+        local_id: number;
+        sequencia: number;
+        distancia_ponto_anterior_metros: number;
+        duracao_desde_inicio_segundos: number;
+        latitude: string;
+        longitude: string;
     }[];
+    polyline: string[];
     rawResponse: any;
 }
 

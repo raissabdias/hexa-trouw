@@ -46,7 +46,7 @@ export class CreateTravelUseCase {
 
         // External routing service call
         const routeResult = await this.routerExternal.calculateRoute(
-            { lat: origin.reference.latitude, lng: origin.reference.longitude },
+            { lat: String(origin.reference.latitude), lng: String(origin.reference.longitude) },
             routerInputs,
             data.startDate,
             companyId
@@ -54,13 +54,9 @@ export class CreateTravelUseCase {
 
         return {
             message: 'Viagem roteirizada com sucesso!',
-            summary: {
-                totalDistance: routeResult.rawResponse.vehicles[0][0].metrics.totalDistance,
-                totalDuration: routeResult.rawResponse.vehicles[0][0].metrics.totalDuration,
-                stops: routeResult.sequence.length
-            },
-            optimizedSequence: routeResult.sequence,
-            rawApiResponse: routeResult.rawResponse
+            summary: routeResult.summary,
+            details: routeResult.details,
+            polyline: routeResult.polyline
         };
     }
 }
