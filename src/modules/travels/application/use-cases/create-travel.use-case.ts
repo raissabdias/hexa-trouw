@@ -7,8 +7,21 @@ import type { RouterExternalPort } from '../../domain/ports/router-external.port
 import type { TravelRepositoryPort } from '../../domain/ports/travel-repository.port';
 import { TravelLogicService } from '../../domain/services/travel-logic.service';
 
+/**
+ * Use case for creating a travel.
+ * Handles all business logic, including validation, fetching dependencies, and calling external services.
+ */
 @Injectable()
 export class CreateTravelUseCase {
+    /**
+     * Constructor with all required dependencies injected.
+     * @param configService Provides access to environment variables and configuration.
+     * @param invoiceRepo Repository for accessing invoice data.
+     * @param locationRepo Repository for accessing location data.
+     * @param routerExternal Port for external routing service integration.
+     * @param travelRepo Repository for persisting travel data.
+     * @param travelLogicService Domain service for travel-related business logic.
+     */
     constructor(
         private readonly configService: ConfigService,
         @Inject('InvoiceRepositoryPort')
@@ -22,25 +35,31 @@ export class CreateTravelUseCase {
         private readonly travelLogicService: TravelLogicService
     ) { }
 
+    /**
+     * Main execution method for the use case.
+     * Validates input, fetches invoices and origin, and processes the travel.
+     * Throws NotFoundException if any required entity is missing.
+     * @param data DTO containing travel creation input data.
+     */
     async execute(data: CreateTravelDto) {
         const companyId = Number(this.configService.get<string>('COMPANY_ID'));
 
-        // 1. Buscar faturas e calcular o valor total (conforme linha 205 do PHP)
         let totalValue = 0;
+        // Fetch all invoices and sum their values. Throws if any invoice is not found.
         const invoices = await Promise.all(
             data.invoiceIds.map(async (id) => {
                 const invoice = await this.invoiceRepo.findById(id, companyId);
-                if (!invoice) throw new NotFoundException(`Fatura ${id} não encontrada.`);
-                totalValue += Number(invoice.value || 0); // Soma nota_valor
+                if (!invoice) throw new NotFoundException(`Invoice ${id} not found.`);
+                totalValue += Number(invoice.value || 0); // Sums invoice value
                 return invoice;
             }),
         );
 
-        // 2. Buscar localização de origem
+        // Fetch the origin location. Throws if not found.
         const origin = await this.locationRepo.findByPersonId(data.originPersonId);
-        if (!origin) throw new NotFoundException(`Origem ${data.originPersonId} não encontrada.`);
+        if (!origin) throw new NotFoundException(`Origin ${data.originPersonId} not found.`);
 
-        // 3. Preparar inputs e chamar Roteirização
+        // Prepare input for the external routing service.
         const routerInputs = invoices.map(inv => ({
             invoiceId: inv.id ?? 0,
             invoiceNumber: inv.number ?? '',
@@ -51,6 +70,7 @@ export class CreateTravelUseCase {
             recipientPersonId: inv.recipientId
         }));
 
+        // Call the external routing service to calculate the optimal route.
         const routeResult = await this.routerExternal.calculateRoute(
             { lat: String(origin.reference.latitude), lng: String(origin.reference.longitude) },
             routerInputs,
@@ -58,13 +78,16 @@ export class CreateTravelUseCase {
             companyId
         );
 
-        // 4. Agrupar Travel Points (Paradas)
-        const travelPoints = this.travelLogicService.groupDetailsIntoTravelPoints(
-            { id: data.originPersonId, lat: String(origin.reference.latitude), lng: String(origin.reference.longitude) },
+        // Group the route details into travel points for further processing.
+        const { travelPoints, synchronizedDetails } = this.travelLogicService.groupDetailsIntoTravelPoints(
+            { 
+                id: data.originPersonId, 
+                lat: String(origin.reference.latitude), 
+                lng: String(origin.reference.longitude) 
+            }, 
             routeResult.details
         );
 
-        // 5. Persistência no Banco Legado (Seguindo tb_planejamento_rotas)
         const travelSaved = await this.travelRepo.save({
             companyId: companyId,
             originId: data.originPersonId,
@@ -77,7 +100,7 @@ export class CreateTravelUseCase {
             startDate: new Date(data.startDate),
             endDate: new Date(new Date(data.startDate).getTime() + routeResult.summary.totalDuration * 1000),
             totalDistance: routeResult.summary.totalDistance,
-            detailsJson: JSON.stringify(routeResult.details),
+            detailsJson: JSON.stringify(synchronizedDetails),
             travelPointsJson: JSON.stringify(travelPoints),
             color: this.generateRandomColor(),
             active: 1,
@@ -87,8 +110,6 @@ export class CreateTravelUseCase {
         });
 
         return {
-            success: true,
-            message: 'Travel created successfully',
             travelId: travelSaved.id,
             summary: routeResult.summary
         };
