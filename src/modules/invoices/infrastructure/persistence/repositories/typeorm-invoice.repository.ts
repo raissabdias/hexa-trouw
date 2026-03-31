@@ -39,36 +39,47 @@ export class TypeOrmInvoiceRepository implements InvoiceRepositoryPort {
         page: number = 1,
         limit: number = 10,
         search?: string,
-        companyId?: number
+        companyId?: number,
+        availableOnly: boolean = false
     ): Promise<{ data: Invoice[], total: number }> {
-        const skip = (page - 1) * limit;
-
-        let whereCondition: any = { 
-            companyId: companyId, 
-            active: 'S'
-        };
+        const query = this.repository.createQueryBuilder('invoice')
+            .leftJoinAndSelect('invoice.status', 'status')
+            .leftJoinAndSelect('invoice.location', 'location')
+            .leftJoinAndSelect('location.person', 'person')
+            .leftJoinAndSelect('location.reference', 'reference')
+            .where('invoice.companyId = :companyId', { companyId })
+            .andWhere('invoice.active = :active', { active: 'S' });
 
         if (search) {
-            whereCondition = {
-                number: ILike(`%${search}%`),
-                companyId: companyId, 
-                active: 'S'
-            };
+            query.andWhere(
+                '(invoice.number ILIKE :search OR person.pess_nome ILIKE :search OR reference.refe_cidade ILIKE :search OR reference.refe_estado ILIKE :search)',
+                { search: `%${search}%` }
+            );
         }
 
-        const [entities, total] = await this.repository.findAndCount({
-            where: whereCondition,
-            relations: ['status', 'location', 'location.person', 'location.reference'],
-            skip: skip,
-            take: limit,
-            order: { id: 'DESC' }
-        });
+        // Filter available invoices by checking for the absence of related active travel records
+        if (availableOnly) {
+            query.andWhere((qb) => {
+                const subQuery = qb.subQuery()
+                    .select('1')
+                    .from('tb_planejamento_rotas', 'travel')
+                    .where('travel.id_pessoa_juridica = :companyId', { companyId })
+                    .andWhere('travel.ativo = 1')
+                    .andWhere(`travel.notas_fiscais @> CAST(invoice.nota_codigo AS TEXT)::jsonb`)
+                    .getQuery();
+                return `NOT EXISTS ${subQuery}`;
+            });
+        }
 
-        const invoices = entities.map(entity => InvoiceMapper.toDomain(entity));
+        const [entities, total] = await query
+            .orderBy('invoice.id', 'DESC')
+            .skip((page - 1) * limit)
+            .take(limit)
+            .getManyAndCount();
 
         return {
-            data: invoices,
-            total: total
+            data: entities.map(entity => InvoiceMapper.toDomain(entity)),
+            total
         };
     }
 }

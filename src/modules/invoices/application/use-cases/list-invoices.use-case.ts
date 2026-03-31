@@ -15,9 +15,10 @@ export class ListInvoicesUseCase {
     async execute(
         page: number = 1,
         limit: number = 10,
-        search?: string
+        search?: string,
+        availableOnly: boolean = false
     ): Promise<{ data: Invoice[], total: number }> {
         const companyId = Number(this.configService.get<string>('COMPANY_ID'));
-        return await this.invoiceRepo.findAll(page, limit, search, companyId);
+        return await this.invoiceRepo.findAll(page, limit, search, companyId, availableOnly);
     }
 }

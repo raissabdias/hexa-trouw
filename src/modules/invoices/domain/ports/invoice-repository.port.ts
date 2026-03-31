@@ -15,6 +15,7 @@ export interface InvoiceRepositoryPort {
         page: number,
         limit: number,
         search?: string,
-        companyId?: number
+        companyId?: number,
+        availableOnly?: boolean
     ): Promise<{ data: Invoice[], total: number }>;
 }

@@ -5,6 +5,7 @@ import { ListInvoicesUseCase } from '../../application/use-cases/list-invoices.u
 import { GetInvoiceByIdUseCase } from '../../application/use-cases/get-invoice-by-id.use-case';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { InvoiceListResponseDto, InvoiceResponseDto, InvoiceSingleResponseDto } from './dto/invoice-response.dto';
+import { ListInvoicesQueryDto } from './dto/list-invoices-query.dto';
 
 @ApiTags('Invoices')
 @Controller('invoices')
@@ -25,16 +26,22 @@ export class InvoiceController {
 
     @Get()
     @ApiOperation({ summary: 'List invoices with pagination and optional search' })
-    @ApiQuery({ name: 'page', required: false, type: Number })
-    @ApiQuery({ name: 'limit', required: false, type: Number })
-    @ApiQuery({ name: 'search', required: false, type: String })
     @ApiResponse({ status: 200, type: InvoiceListResponseDto, description: 'Listed successfully' })
-    async findAll(
-        @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
-        @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
-        @Query('search') search?: string,
-    ) {
-        return await this.listInvoicesUseCase.execute(page, limit, search);
+    async findAll(@Query() query: ListInvoicesQueryDto) {
+        // Conversão manual de tipos para evitar dependência de class-transformer
+        const formattedQuery = {
+            page: Number(query.page) || 1,
+            limit: Number(query.limit) || 10,
+            search: query.search,
+            availableOnly: query.availableOnly === 'true'
+        };
+
+        return await this.listInvoicesUseCase.execute(
+            formattedQuery.page,
+            formattedQuery.limit,
+            formattedQuery.search,
+            formattedQuery.availableOnly
+        );
     }
 
     @Get(':id')
