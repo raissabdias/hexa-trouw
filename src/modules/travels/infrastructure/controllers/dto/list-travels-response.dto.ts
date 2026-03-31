@@ -71,6 +71,18 @@ export class TravelListItemDto {
     @ApiProperty({ example: 15500.50 })
     totalValue: number;
 
+    @ApiProperty({ 
+        example: 'blue', 
+        description: 'Hexadecimal or name of the route color' 
+    })
+    color: string;
+
+    @ApiProperty({ 
+        example: ["BGpts-sB5l6_...", "Az_sXj2..."], 
+        description: 'Array of encoded polylines for map segments' 
+    })
+    polyline: string[];
+
     @ApiProperty({ type: TravelPointDto })
     origin: TravelPointDto;
 

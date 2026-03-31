@@ -40,6 +40,7 @@ export class ListTravelsUseCase {
             // Parse invoice IDs and travel points from JSON fields
             const invoiceIds = safeParse(travel.invoiceIdsJson);
             const pointsRaw = safeParse(travel.travelPointsJson);
+            const polylineArray = safeParse(travel.polyline);
 
             // Enrich travel points with location data
             const travelPoints = await Promise.all(
@@ -68,6 +69,8 @@ export class ListTravelsUseCase {
                 endDate: travel.endDate,
                 totalDistance: travel.totalDistance,
                 totalValue: travel.totalValue,
+                color: travel.color,
+                polyline: polylineArray,
                 origin: originPoint,
                 travelPoints: travelPoints
             };
