@@ -8,6 +8,7 @@ import { ListTravelsResponseDto } from './dto/list-travels-response.dto';
 import { ListTravelsUseCase } from '../../application/use-cases/list-travels.use-case';
 import { DeleteTravelUseCase } from '../../application/use-cases/delete-travel.use-case';
 import { DeleteTravelResponseDto } from './dto/delete-travel-response.dto';
+import { GetTravelByIdUseCase } from '../../application/use-cases/get-travel-by-id.use-case';
 
 @ApiTags('Travels')
 @Controller('travels')
@@ -15,7 +16,8 @@ export class TravelController {
     constructor(
         private readonly createTravelUseCase: CreateTravelUseCase,
         private readonly listTravelsUseCase: ListTravelsUseCase,
-        private readonly deleteTravelUseCase: DeleteTravelUseCase
+        private readonly deleteTravelUseCase: DeleteTravelUseCase,
+        private readonly getTravelByIdUseCase: GetTravelByIdUseCase,
     ) {}
 
     @Post()
@@ -51,7 +53,7 @@ export class TravelController {
 
     @Delete(':id')
     @ApiOperation({ summary: 'Deactivate a travel plan (Soft Delete)' })
-@ApiOkResponse({ 
+    @ApiOkResponse({ 
         description: 'Travel plan deactivated successfully',
         type: DeleteTravelResponseDto 
     })
@@ -61,5 +63,13 @@ export class TravelController {
     })
     async remove(@Param('id', ParseIntPipe) id: number) {
         return await this.deleteTravelUseCase.execute(id);
+    }
+
+    @Get(':id')
+    @ApiOperation({ summary: 'Get detailed travel plan by ID' })
+    @ApiOkResponse({ description: 'Travel plan details retrieved successfully' })
+    @ApiNotFoundResponse({ description: 'Travel plan not found' })
+    async findById(@Param('id', ParseIntPipe) id: number) {
+        return await this.getTravelByIdUseCase.execute(id);
     }
 }
