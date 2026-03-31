@@ -11,6 +11,7 @@ import { TravelLogicService } from './domain/services/travel-logic.service';
 import { TravelEntity } from './infrastructure/persistence/entities/travel.entity';
 import { TypeOrmTravelRepositoryAdapter } from './infrastructure/persistence/adapters/typeorm-travel-repository.adapter';
 import { ListTravelsUseCase } from './application/use-cases/list-travels.use-case';
+import { DeleteTravelUseCase } from './application/use-cases/delete-travel.use-case';
 
 @Module({
     imports: [
@@ -26,6 +27,7 @@ import { ListTravelsUseCase } from './application/use-cases/list-travels.use-cas
     providers: [
         CreateTravelUseCase,
         ListTravelsUseCase,
+        DeleteTravelUseCase,
         TravelLogicService,
         {
             provide: 'RouterExternalPort',

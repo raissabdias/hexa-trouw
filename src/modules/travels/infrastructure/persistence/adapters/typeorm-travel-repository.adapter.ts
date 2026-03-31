@@ -16,6 +16,12 @@ export class TypeOrmTravelRepositoryAdapter implements TravelRepositoryPort {
         return await this.repository.save(newTravel);
     }
 
+    async findById(id: number, companyId: number): Promise<TravelEntity | null> {
+        return await this.repository.findOne({
+            where: { id, companyId, active: 1 }
+        });
+    }
+
     async findAll(
         page: number,
         limit: number,
@@ -38,5 +44,9 @@ export class TypeOrmTravelRepositoryAdapter implements TravelRepositoryPort {
             data: entities,
             total
         };
+    }
+
+    async update(id: number, data: Partial<TravelEntity>): Promise<void> {
+        await this.repository.update(id, data);
     }
 }

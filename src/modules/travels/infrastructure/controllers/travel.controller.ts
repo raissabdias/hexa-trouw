@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpStatus, HttpCode, Get, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus, HttpCode, Get, Query, ParseIntPipe, Delete, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiOkResponse, ApiNotFoundResponse, ApiQuery } from '@nestjs/swagger';
 import { CreateTravelDto } from './dto/create-travel.dto';
 import { CreateTravelUseCase } from '../../application/use-cases/create-travel.use-case';
@@ -6,13 +6,16 @@ import { CreateTravelResponseDto } from './dto/create-travel-response.dto';
 import { NotFoundResponseDto } from '../../../../common/dto/not-found-response.dto';
 import { ListTravelsResponseDto } from './dto/list-travels-response.dto';
 import { ListTravelsUseCase } from '../../application/use-cases/list-travels.use-case';
+import { DeleteTravelUseCase } from '../../application/use-cases/delete-travel.use-case';
+import { DeleteTravelResponseDto } from './dto/delete-travel-response.dto';
 
 @ApiTags('Travels')
 @Controller('travels')
 export class TravelController {
     constructor(
         private readonly createTravelUseCase: CreateTravelUseCase,
-        private readonly listTravelsUseCase: ListTravelsUseCase
+        private readonly listTravelsUseCase: ListTravelsUseCase,
+        private readonly deleteTravelUseCase: DeleteTravelUseCase
     ) {}
 
     @Post()
@@ -44,5 +47,19 @@ export class TravelController {
         @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
     ): Promise<ListTravelsResponseDto> {
         return await this.listTravelsUseCase.execute(page, limit);
+    }
+
+    @Delete(':id')
+    @ApiOperation({ summary: 'Deactivate a travel plan (Soft Delete)' })
+@ApiOkResponse({ 
+        description: 'Travel plan deactivated successfully',
+        type: DeleteTravelResponseDto 
+    })
+    @ApiNotFoundResponse({ 
+        description: 'Travel plan not found',
+        type: NotFoundResponseDto 
+    })
+    async remove(@Param('id', ParseIntPipe) id: number) {
+        return await this.deleteTravelUseCase.execute(id);
     }
 }
