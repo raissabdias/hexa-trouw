@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, JoinColumn, ManyToOne } from 'typeorm';
+import { LocationEntity } from '../../../../locations/infrastructure/persistence/entities/location.entity';
 
 @Entity('tb_planejamento_rotas')
 export class TravelEntity {
@@ -13,6 +14,10 @@ export class TravelEntity {
 
     @Column({ name: 'id_origem' })
     originId: number;
+
+    @ManyToOne(() => LocationEntity)
+    @JoinColumn({ name: 'id_origem', referencedColumnName: 'personId' })
+    originLocation: LocationEntity;
 
     @Column({ name: 'notas_fiscais', type: 'text' })
     invoiceIdsJson: string; //

@@ -10,6 +10,7 @@ import { HttpModule } from '@nestjs/axios';
 import { TravelLogicService } from './domain/services/travel-logic.service';
 import { TravelEntity } from './infrastructure/persistence/entities/travel.entity';
 import { TypeOrmTravelRepositoryAdapter } from './infrastructure/persistence/adapters/typeorm-travel-repository.adapter';
+import { ListTravelsUseCase } from './application/use-cases/list-travels.use-case';
 
 @Module({
     imports: [
@@ -24,6 +25,7 @@ import { TypeOrmTravelRepositoryAdapter } from './infrastructure/persistence/ada
     ],
     providers: [
         CreateTravelUseCase,
+        ListTravelsUseCase,
         TravelLogicService,
         {
             provide: 'RouterExternalPort',
