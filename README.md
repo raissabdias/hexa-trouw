@@ -23,14 +23,11 @@ O sistema é estruturado seguindo o padrão Ports and Adapters (Arquitetura Hexa
 ### Travels (Viagens)
 Módulo responsável pelo planeamento de rotas e consolidação de carga:
 * Integração com o microsserviço MS Cubing para otimização de trajetos.
-* Algoritmo para sincronização de sequência de faturas por localidade para compatibilidade legada.
-* Cálculo automático de peso total, cubagem total (conversão de cm3 para m3) e valor financeiro da viagem.
-* Listagem detalhada de rotas com enriquecimento de dados de endereço e identificação de tipos de parada (Origem/Entrega).
 
-### Invoices (Faturas)
+### Invoices (Notas Fiscais)
 Gestão de Notas Fiscais vinculadas ao fluxo logístico:
 * Validação de duplicidade por número e empresa.
-* Vínculo direto entre faturas e destinatários cadastrados no sistema.
+* Vínculo direto entre notas fiscais e destinatários cadastrados no sistema.
 
 ### Locations (Localizações)
 Gestão de pontos geográficos e entidades associadas:
@@ -42,14 +39,17 @@ Gestão de pontos geográficos e entidades associadas:
 Todas as chamadas da API retornam um formato padronizado via Interceptor global:
 
 **Sucesso (200/201):**
+```json
 {
   "success": true,
   "message": "Operation successful",
   "data": { ... },
   "meta": { "total": 0 }
 }
+```
 
 **Erro (400/404/500):**
+```json
 {
   "success": false,
   "statusCode": 404,
@@ -58,15 +58,16 @@ Todas as chamadas da API retornam um formato padronizado via Interceptor global:
   "message": "Description of the error",
   "error": "ErrorType"
 }
+```
 
 ## Execução do Projeto
 
-O projeto está configurado para correr em ambientes conteinerizados:
+O projeto está configurado para rodar em ambientes conteinerizados:
 
 1. Certifique-se de que as variáveis de ambiente estão configuradas no ficheiro .env.
 2. Inicie os serviços via Docker Compose:
 
 docker-compose up --build
 
-A API estará disponível na porta 3000. A documentação Swagger pode ser acedida em:
+A API estará disponível na porta 3000. A documentação Swagger está disponível em:
 http://localhost:3000/api/docs
