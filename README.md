@@ -64,10 +64,12 @@ Todas as chamadas da API retornam um formato padronizado via Interceptor global:
 
 O projeto está configurado para rodar em ambientes conteinerizados:
 
-1. Certifique-se de que as variáveis de ambiente estão configuradas no ficheiro .env.
+1. Certifique-se de que as variáveis de ambiente estão configuradas no .env.
 2. Inicie os serviços via Docker Compose:
 
+```json
 docker-compose up --build
+```
 
 A API estará disponível na porta 3000. A documentação Swagger está disponível em:
 http://localhost:3000/api/docs
