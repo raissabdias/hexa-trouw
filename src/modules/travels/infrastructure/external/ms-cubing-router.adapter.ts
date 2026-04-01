@@ -3,12 +3,16 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { RouterExternalPort, RouterInvoiceInput, RouterResponse } from '../../domain/ports/router-external.port';
 import { AxiosResponse } from 'axios';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MsCubingRouterAdapter implements RouterExternalPort {
-    private readonly url = 'https://prd-ms-cubing.trouw.com.br/api/v1/cubing/optimized/here-manual';
+    private readonly url = '';
 
-    constructor(private readonly httpService: HttpService) {}
+    constructor(
+        private readonly httpService: HttpService,
+        private readonly configService: ConfigService,
+    ) {}
 
     async calculateRoute(
         origin: { lat: string; lng: string },
@@ -16,6 +20,12 @@ export class MsCubingRouterAdapter implements RouterExternalPort {
         startDate: string,
         companyId: number
     ): Promise<RouterResponse> {
+        const url = this.configService.get<string>('MS_CUBING_URL');
+
+        if (!url) {
+            throw new InternalServerErrorException('MS_CUBING_URL is not defined in environment variables');
+        }
+
         // Capacity totals
         const totalWeight = invoices.reduce((sum, inv) => sum + inv.weight, 0);
         const totalVolume = invoices.reduce((sum, inv) => sum + inv.volume, 0);
@@ -56,7 +66,7 @@ export class MsCubingRouterAdapter implements RouterExternalPort {
 
         try {
             const response: AxiosResponse<any> = await firstValueFrom(
-                this.httpService.post<any>(this.url, payload)
+                this.httpService.post<any>(url, payload)
             );
             
             const data = Array.isArray(response.data) ? response.data[0] : response.data;
