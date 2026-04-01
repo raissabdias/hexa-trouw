@@ -2,6 +2,7 @@ import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { createHash } from 'crypto';
 import type { UserRepositoryPort } from '../../domain/ports/user-repository.port';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class LoginUseCase {
@@ -9,6 +10,7 @@ export class LoginUseCase {
         @Inject('UserRepositoryPort')
         private readonly userRepo: UserRepositoryPort,
         private readonly configService: ConfigService,
+        private readonly jwtService: JwtService,
     ) {}
 
     /**
@@ -36,11 +38,17 @@ export class LoginUseCase {
             throw new UnauthorizedException('Invalid credentials');
         }
 
+        const payload = { 
+            sub: user.id, 
+            username: user.login 
+        };
+
         return {
             message: 'Login successful',
             data: {
                 userId: user.id,
-                login: user.login
+                login: user.login,
+                accessToken: this.jwtService.sign(payload) 
             }
         };
     }
