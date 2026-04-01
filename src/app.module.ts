@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_GUARD } from '@nestjs/core';
 import { LocationsModule } from './modules/locations/locations.module';
 import { InvoiceModule } from './modules/invoices/invoices.module';
 import { TravelsModule } from './modules/travels/travels.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { JwtAuthGuard } from './modules/auth/infrastructure/guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -30,6 +32,12 @@ import { AuthModule } from './modules/auth/auth.module';
     InvoiceModule,
     TravelsModule,
     AuthModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
   ],
 })
 export class AppModule { }

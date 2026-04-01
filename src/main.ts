@@ -15,8 +15,18 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Hexa Trouw API')
-    .setDescription('Documentação das APIs de Criação de Rotas')
+    .setDescription('API documentation for Hexa Trouw')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Insert JWT token here',
+        in: 'header',
+      },
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

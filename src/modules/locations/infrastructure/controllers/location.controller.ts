@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Get, ParseIntPipe, Param, Query, HttpStatus, HttpCode } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateLocationUseCase } from '../../application/use-cases/create-location.use-case';
 import { ListLocationsUseCase } from '../../application/use-cases/list-locations.use-case';
 import { GetLocationByPersonUseCase } from '../../application/use-cases/get-location-by-person.use-case';
@@ -8,6 +8,7 @@ import { LocationListResponseDto, LocationSingleResponseDto } from './dto/locati
 import { ApiResponseDto } from '../../../../common/dto/api-response.dto';
 
 @ApiTags('Locations')
+@ApiBearerAuth('access-token')
 @Controller('locations')
 // HTTP adapter responsible for location write operations
 export class LocationController {

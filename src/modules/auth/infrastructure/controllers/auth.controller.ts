@@ -3,12 +3,14 @@ import { ApiTags, ApiOperation, ApiOkResponse, ApiUnauthorizedResponse } from '@
 import { LoginUseCase } from '../../application/use-cases/login.use-case';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
+import { Public } from '../../../../common/decorators/is-public.decorator';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
     constructor(private readonly loginUseCase: LoginUseCase) {}
 
+    @Public()
     @Post('login')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Authenticate user with login and MD5 password' })

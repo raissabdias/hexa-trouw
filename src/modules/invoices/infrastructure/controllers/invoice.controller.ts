@@ -1,5 +1,5 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, Get, ParseIntPipe, Query, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateInvoiceUseCase } from '../../application/use-cases/create-invoice.use-case';
 import { ListInvoicesUseCase } from '../../application/use-cases/list-invoices.use-case';
 import { GetInvoiceByIdUseCase } from '../../application/use-cases/get-invoice-by-id.use-case';
@@ -8,6 +8,7 @@ import { InvoiceListResponseDto, InvoiceResponseDto, InvoiceSingleResponseDto } 
 import { ListInvoicesQueryDto } from './dto/list-invoices-query.dto';
 
 @ApiTags('Invoices')
+@ApiBearerAuth('access-token')
 @Controller('invoices')
 export class InvoiceController {
     constructor(

@@ -1,5 +1,5 @@
 import { Controller, Post, Body, HttpStatus, HttpCode, Get, Query, ParseIntPipe, Delete, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiOkResponse, ApiNotFoundResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiOkResponse, ApiNotFoundResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateTravelDto } from './dto/create-travel.dto';
 import { CreateTravelUseCase } from '../../application/use-cases/create-travel.use-case';
 import { CreateTravelResponseDto } from './dto/create-travel-response.dto';
@@ -11,6 +11,7 @@ import { DeleteTravelResponseDto } from './dto/delete-travel-response.dto';
 import { GetTravelByIdUseCase } from '../../application/use-cases/get-travel-by-id.use-case';
 
 @ApiTags('Travels')
+@ApiBearerAuth('access-token')
 @Controller('travels')
 export class TravelController {
     constructor(

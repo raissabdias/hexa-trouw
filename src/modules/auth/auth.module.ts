@@ -6,6 +6,7 @@ import { UserEntity } from './infrastructure/persistence/entities/user.entity';
 import { TypeOrmUserRepositoryAdapter } from './infrastructure/persistence/adapters/typeorm-user-repository.adapter';
 import { AuthController } from './infrastructure/controllers/auth.controller';
 import { LoginUseCase } from './application/use-cases/login.use-case';
+import { JwtStrategy } from './infrastructure/strategies/jwt.strategy';
 
 @Module({
     imports: [
@@ -24,6 +25,7 @@ import { LoginUseCase } from './application/use-cases/login.use-case';
     controllers: [AuthController],
     providers: [
         LoginUseCase,
+        JwtStrategy,
         {
             provide: 'UserRepositoryPort',
             useClass: TypeOrmUserRepositoryAdapter,
