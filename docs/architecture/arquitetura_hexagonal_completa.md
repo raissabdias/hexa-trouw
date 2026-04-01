@@ -4,7 +4,7 @@
 
 ---
 
-## 1. O Problema que a Arquitetura Hexagonal Resolve
+## O Problema que a Arquitetura Hexagonal Resolve
 
 Imagine um sistema onde:
 
@@ -19,7 +19,7 @@ A Arquitetura Hexagonal (também chamada **Ports and Adapters**) resolve tudo is
 
 ---
 
-## 2. As Três Camadas
+## As Três Camadas
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -115,7 +115,7 @@ providers: [
 
 ---
 
-## 4. Fluxo Completo — Da Requisição ao Banco
+## Fluxo Completo — Da Requisição ao Banco
 
 ```
 ┌──────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────┐
@@ -131,7 +131,7 @@ providers: [
 
 ---
 
-## 5. Diagrama Geral da Arquitetura
+## Diagrama Geral da Arquitetura
 
 ```
                     ┌──────────────────────────────────────────────┐
@@ -190,7 +190,7 @@ providers: [
 
 ---
 
-## 9. Como Criar uma Nova Funcionalidade
+## Como Criar uma Nova Funcionalidade
 
 Siga esta ordem (de dentro para fora):
 
@@ -228,7 +228,7 @@ Siga esta ordem (de dentro para fora):
    - Providers (Port → Adapter)
 ```
 
-## 10. Benefícios Concretos
+## Benefícios Concretos
 
 | Benefício                      | Como funciona                                           |
 | ------------------------------ | ------------------------------------------------------- |
@@ -239,7 +239,7 @@ Siga esta ordem (de dentro para fora):
 | **Manutenibilidade**           | Cada camada tem responsabilidade clara e isolada        |
 
 
-## 11. Padrões Importantes Aplicados
+## Padrões Importantes Aplicados
 
 ### Dependency Inversion
 
