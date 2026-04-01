@@ -13,8 +13,8 @@ export class TypeOrmUserRepositoryAdapter implements UserRepositoryPort {
 
     async findByLogin(login: string): Promise<UserEntity | null> {
         // Login is unique, so this query returns at most one user.
-        return await this.repository.findOne({
-            where: { login }
-        });
+        return await this.repository.createQueryBuilder('user')
+            .where('LOWER(user.login) = LOWER(:login)', { login })
+            .getOne();
     }
 }

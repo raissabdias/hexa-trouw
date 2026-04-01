@@ -1,8 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
 
 @Entity('usua_usuario')
 export class UserEntity {
-    @PrimaryGeneratedColumn({ name: 'usua_codigo' })
+    @PrimaryColumn({ name: 'usua_pfis_pess_oras_codigo' })
     id: number;
 
     @Column({ name: 'usua_login', unique: true })
@@ -10,7 +10,4 @@ export class UserEntity {
 
     @Column({ name: 'usua_senha_md5' })
     passwordHash: string;
-
-    @Column({ name: 'usua_pfis_pess_oras_codigo' })
-    personId: number;
 }

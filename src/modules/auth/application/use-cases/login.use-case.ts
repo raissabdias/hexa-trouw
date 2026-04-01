@@ -1,12 +1,14 @@
 import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { createHash } from 'crypto';
 import type { UserRepositoryPort } from '../../domain/ports/user-repository.port';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class LoginUseCase {
     constructor(
         @Inject('UserRepositoryPort')
         private readonly userRepo: UserRepositoryPort,
+        private readonly configService: ConfigService,
     ) {}
 
     /**
@@ -16,13 +18,18 @@ export class LoginUseCase {
      */
     async execute(login: string, password: string) {
         const user = await this.userRepo.findByLogin(login);
-
         if (!user) {
             throw new UnauthorizedException('Invalid credentials');
         }
 
-        const inputPasswordHash = createHash('md5')
-            .update(password)
+        const staticSalt = this.configService.get<string>('AUTH_STATIC_SALT');
+        if (!staticSalt) {
+            throw new Error('Auth salt is not defined in environment variables');
+        }
+
+        const credentialsToHash = `${staticSalt}${user.login}${password}`;
+        const inputPasswordHash = createHash('sha1')
+            .update(credentialsToHash)
             .digest('hex');
 
         if (inputPasswordHash !== user.passwordHash) {
@@ -30,10 +37,11 @@ export class LoginUseCase {
         }
 
         return {
-            userId: user.id,
-            login: user.login,
-            personId: user.personId,
-            message: 'Login successful'
+            message: 'Login successful',
+            data: {
+                userId: user.id,
+                login: user.login
+            }
         };
     }
 }
