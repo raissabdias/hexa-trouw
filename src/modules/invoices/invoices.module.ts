@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { InvoiceEntity } from './infrastructure/persistence/entities/invoice.entity';
-import { TypeOrmInvoiceRepository } from './infrastructure/persistence/repositories/typeorm-invoice.repository';
+import { TypeOrmInvoiceRepositoryAdapter } from './infrastructure/persistence/adapters/typeorm-invoice-repository.adapter';
 import { CreateInvoiceUseCase } from './application/use-cases/create-invoice.use-case';
 import { InvoiceController } from './infrastructure/controllers/invoice.controller';
 import { ListInvoicesUseCase } from './application/use-cases/list-invoices.use-case';
@@ -28,7 +28,7 @@ import { LocationEntity } from '../locations/infrastructure/persistence/entities
         GetInvoiceByIdUseCase,
         {
             provide: 'InvoiceRepositoryPort',
-            useClass: TypeOrmInvoiceRepository,
+            useClass: TypeOrmInvoiceRepositoryAdapter,
         },
     ],
     exports: ['InvoiceRepositoryPort'],

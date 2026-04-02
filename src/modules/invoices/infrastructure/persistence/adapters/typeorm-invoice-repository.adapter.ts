@@ -7,7 +7,7 @@ import { InvoiceEntity } from '../entities/invoice.entity';
 import { InvoiceMapper } from '../mappers/invoice.mapper';
 
 @Injectable()
-export class TypeOrmInvoiceRepository implements InvoiceRepositoryPort {
+export class TypeOrmInvoiceRepositoryAdapter implements InvoiceRepositoryPort {
     constructor(
         @InjectRepository(InvoiceEntity)
         private readonly repository: Repository<InvoiceEntity>,

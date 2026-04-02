@@ -4,7 +4,7 @@ import { LocationEntity } from './infrastructure/persistence/entities/location.e
 import { LocationController } from './infrastructure/controllers/location.controller';
 import { CreateLocationUseCase } from './application/use-cases/create-location.use-case';
 import { ListLocationsUseCase } from './application/use-cases/list-locations.use-case';
-import { TypeOrmLocationRepository } from './infrastructure/persistence/typeorm-location.repository';
+import { TypeOrmLocationRepositoryAdapter } from './infrastructure/persistence/adapters/typeorm-location-repository.adapter';
 import { PersonsModule } from '../persons/persons.module';
 import { GetLocationByPersonUseCase } from './application/use-cases/get-location-by-person.use-case';
 
@@ -20,7 +20,7 @@ import { GetLocationByPersonUseCase } from './application/use-cases/get-location
         GetLocationByPersonUseCase,
         {
             provide: 'LocationRepositoryPort',
-            useClass: TypeOrmLocationRepository,
+            useClass: TypeOrmLocationRepositoryAdapter,
         },
     ],
     exports: ['LocationRepositoryPort'],

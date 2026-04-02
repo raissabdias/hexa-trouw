@@ -7,6 +7,7 @@ import { InvoiceModule } from './modules/invoices/invoices.module';
 import { TravelsModule } from './modules/travels/travels.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './modules/auth/infrastructure/guards/jwt-auth.guard';
+import { RegionsModule } from './modules/regions/regions.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { JwtAuthGuard } from './modules/auth/infrastructure/guards/jwt-auth.guar
     InvoiceModule,
     TravelsModule,
     AuthModule,
+    RegionsModule,
   ],
   providers: [
     {
