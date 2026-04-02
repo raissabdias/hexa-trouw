@@ -11,8 +11,14 @@ export class ListRegionsUseCase {
     private readonly configService: ConfigService,
   ) {}
 
-  async execute(): Promise<Region[]> {
-    const companyId = Number(this.configService.get<string>('COMPANY_ID'));
+  async execute(userCompanyId?: number): Promise<Region[]> {
+    const envCompanyId = this.configService.get<string>('COMPANY_ID');
+    const companyId = envCompanyId ? Number(envCompanyId) : userCompanyId;
+
+    if (!companyId) {
+      return [];
+    }
+
     return this.regionRepo.findAll(companyId);
   }
 }

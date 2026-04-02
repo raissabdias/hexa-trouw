@@ -4,20 +4,28 @@ import type { InvoiceRepositoryPort } from '../../domain/ports/invoice-repositor
 
 @Injectable()
 export class GetInvoiceByIdUseCase {
-    constructor(
-        @Inject('InvoiceRepositoryPort')
-        private readonly invoiceRepo: InvoiceRepositoryPort,
-        private readonly configService: ConfigService,
-    ) {}
+  constructor(
+    @Inject('InvoiceRepositoryPort')
+    private readonly invoiceRepo: InvoiceRepositoryPort,
+    private readonly configService: ConfigService,
+  ) {}
 
-    async execute(id: number) {
-        const companyId = Number(this.configService.get<string>('COMPANY_ID'));
-        const invoice = await this.invoiceRepo.findById(id, companyId);
+  async execute(id: number, userCompanyId?: number) {
+    const envCompanyId = this.configService.get<string>('COMPANY_ID');
+    const companyId = envCompanyId ? Number(envCompanyId) : userCompanyId;
 
-        if (!invoice) {
-            throw new NotFoundException(`Invoice not found for ID ${id} and company ID ${companyId}`);
-        }
-
-        return invoice;
+    if (!companyId) {
+      throw new NotFoundException(`Company ID is required`);
     }
+
+    const invoice = await this.invoiceRepo.findById(id, companyId);
+
+    if (!invoice) {
+      throw new NotFoundException(
+        `Invoice not found for ID ${id} and company ID ${companyId}`,
+      );
+    }
+
+    return invoice;
+  }
 }

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity('usua_usuario')
 export class UserEntity {
@@ -10,4 +10,7 @@ export class UserEntity {
 
     @Column({ name: 'usua_senha_md5' })
     passwordHash: string;
+    
+    @Column({ name: 'usua_pess_oras_codigo' })
+    companyId: number;
 }

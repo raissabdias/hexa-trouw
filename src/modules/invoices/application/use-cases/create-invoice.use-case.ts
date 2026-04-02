@@ -6,38 +6,45 @@ import { Invoice } from '../../domain/models/invoice.model';
 @Injectable()
 // Application service for creating a new invoice, enforcing business rules.
 export class CreateInvoiceUseCase {
-    constructor(
-        @Inject('InvoiceRepositoryPort')
-        private readonly invoiceRepo: InvoiceRepositoryPort,
-        private readonly configService: ConfigService,
-    ) {}
+  constructor(
+    @Inject('InvoiceRepositoryPort')
+    private readonly invoiceRepo: InvoiceRepositoryPort,
+    private readonly configService: ConfigService,
+  ) {}
 
-    async execute(data: any): Promise<Invoice> {
-        // Get company context from configuration.
-        const companyId = Number(this.configService.get<string>('COMPANY_ID'));
+  async execute(data: any, userCompanyId?: number): Promise<Invoice> {
+    const envCompanyId = this.configService.get<string>('COMPANY_ID');
+    const companyId = envCompanyId ? Number(envCompanyId) : userCompanyId;
 
-        // Prevent duplicate invoice numbers for the same company.
-        const existing = await this.invoiceRepo.findByNumber(data.number, companyId);
-        if (existing) {
-            throw new ConflictException(`Invoice ${data.number} already exists.`);
-        }
-
-        // Compose the domain model for the new invoice.
-        const invoice = new Invoice(
-            null,
-            data.number,
-            data.series,
-            data.value,
-            data.weight,
-            data.volume,
-            data.recipientId,
-            companyId,
-            1, // Default status
-            true,
-            data.issuedAt ? new Date(data.issuedAt) : null,
-            data.scheduledDelivery ? new Date(data.scheduledDelivery) : null
-        );
-
-        return await this.invoiceRepo.save(invoice);
+    if (!companyId) {
+      throw new Error('Company ID is required');
     }
+
+    // Prevent duplicate invoice numbers for the same company.
+    const existing = await this.invoiceRepo.findByNumber(
+      data.number,
+      companyId,
+    );
+    if (existing) {
+      throw new ConflictException(`Invoice ${data.number} already exists.`);
+    }
+
+    // Compose the domain model for the new invoice.
+    const invoice = new Invoice(
+      null,
+      data.number,
+      data.series,
+      data.value,
+      data.weight,
+      data.volume,
+      data.recipientId,
+      companyId,
+      1, // Default status
+      true,
+      data.issuedAt ? new Date(data.issuedAt) : null,
+      data.scheduledDelivery ? new Date(data.scheduledDelivery) : null,
+    );
+
+    return await this.invoiceRepo.save(invoice);
+  }
 }

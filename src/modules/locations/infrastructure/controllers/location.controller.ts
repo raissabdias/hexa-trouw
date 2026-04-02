@@ -1,54 +1,92 @@
-import { Controller, Post, Body, Get, ParseIntPipe, Param, Query, HttpStatus, HttpCode } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  ParseIntPipe,
+  Param,
+  Query,
+  HttpStatus,
+  HttpCode,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { CreateLocationUseCase } from '../../application/use-cases/create-location.use-case';
 import { ListLocationsUseCase } from '../../application/use-cases/list-locations.use-case';
 import { GetLocationByPersonUseCase } from '../../application/use-cases/get-location-by-person.use-case';
 import { CreateLocationDto } from './dto/create-location.dto';
-import { LocationListResponseDto, LocationSingleResponseDto } from './dto/location-response.dto';
+import {
+  LocationListResponseDto,
+  LocationSingleResponseDto,
+} from './dto/location-response.dto';
 import { ApiResponseDto } from '../../../../common/dto/api-response.dto';
+import { CurrentCompanyId } from '../../../auth/infrastructure/decorators/current-company-id.decorator';
 
 @ApiTags('Locations')
 @ApiBearerAuth('access-token')
 @Controller('locations')
 // HTTP adapter responsible for location write operations
 export class LocationController {
-    constructor(
-        private readonly createLocationUseCase: CreateLocationUseCase,
-        private readonly listLocationsUseCase: ListLocationsUseCase,
-        private readonly getLocationByPersonUseCase: GetLocationByPersonUseCase,
-    ) { }
+  constructor(
+    private readonly createLocationUseCase: CreateLocationUseCase,
+    private readonly listLocationsUseCase: ListLocationsUseCase,
+    private readonly getLocationByPersonUseCase: GetLocationByPersonUseCase,
+  ) {}
 
-    @Post()
-    @ApiOperation({ summary: 'Create a new location' })
-    @ApiBody({ type: CreateLocationDto })
-    @ApiResponse({ status: 201, type: LocationSingleResponseDto, description: 'Location created successfully' })
-    @HttpCode(HttpStatus.CREATED)
-    async create(@Body() body: CreateLocationDto) {
-        // Delegate business logic to the application layer
-        return await this.createLocationUseCase.execute(body);
-    }
+  @Post()
+  @ApiOperation({ summary: 'Create a new location' })
+  @ApiBody({ type: CreateLocationDto })
+  @ApiResponse({
+    status: 201,
+    type: LocationSingleResponseDto,
+    description: 'Location created successfully',
+  })
+  @HttpCode(HttpStatus.CREATED)
+  async create(
+    @Body() body: CreateLocationDto,
+    @CurrentCompanyId() companyId?: number,
+  ) {
+    // Delegate business logic to the application layer
+    return await this.createLocationUseCase.execute(body, companyId);
+  }
 
-    @Get()
-    @ApiOperation({ summary: 'List locations with pagination and optional search' })
-    @ApiQuery({ name: 'page', required: false, type: Number })
-    @ApiQuery({ name: 'limit', required: false, type: Number })
-    @ApiQuery({ name: 'search', required: false, type: String })
-    @ApiResponse({ status: 200, type: LocationListResponseDto, description: 'Listed successfully' })
-    async findAll(
-        @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
-        @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
+  @Get()
+  @ApiOperation({
+    summary: 'List locations with pagination and optional search',
+  })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiResponse({
+    status: 200,
+    type: LocationListResponseDto,
+    description: 'Listed successfully',
+  })
+  async findAll(
+    @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
+    @Query('search') search?: string,
+    @CurrentCompanyId() companyId?: number,
+  ) {
+    return this.listLocationsUseCase.execute(page, limit, search, companyId);
+  }
 
-        @Query('search') search?: string,
-    ) {
-        return this.listLocationsUseCase.execute(page, limit, search);
-    }
-
-    @Get(':personId')
-    @ApiOperation({ summary: 'Get location by person ID' })
-    @ApiResponse({ status: 200, type: LocationSingleResponseDto, description: 'Location found.' })
-    @ApiResponse({ status: 404, description: 'Location not found.' })
-    async findByPerson(@Param('personId', ParseIntPipe) personId: number) {
-        // Delegate the search to the Use Case we created
-        return await this.getLocationByPersonUseCase.execute(personId);
-    }
+  @Get(':personId')
+  @ApiOperation({ summary: 'Get location by person ID' })
+  @ApiResponse({
+    status: 200,
+    type: LocationSingleResponseDto,
+    description: 'Location found.',
+  })
+  @ApiResponse({ status: 404, description: 'Location not found.' })
+  async findByPerson(@Param('personId', ParseIntPipe) personId: number) {
+    // Delegate the search to the Use Case we created
+    return await this.getLocationByPersonUseCase.execute(personId);
+  }
 }
